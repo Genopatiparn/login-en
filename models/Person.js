@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 
 const personSchema = new mongoose.Schema({
+  // รหัสพนักงาน/รหัสนักเรียน (แยกจาก _id)
+  id: { type: String, unique: true, sparse: true }, // sparse: true = ไม่บังคับต้องมี
+  
   // ข้อมูลพื้นฐาน (บังคับ)
   thaiTitle: { type: String, default: '' },
   firstName: { type: String, required: true },
@@ -168,6 +171,9 @@ const personSchema = new mongoose.Schema({
   timestamps: true,
   toJSON: {
     transform: function(doc, ret) {
+      // เพิ่ม id กลับเข้าไป (แบบ junior dev)
+      ret.id = ret._id;
+      
       // แปลง createdAt และ updatedAt เป็น timezone +07:00 (Thailand)
       if (ret.createdAt) {
         const createdAtThailand = new Date(ret.createdAt.getTime() + (7 * 60 * 60 * 1000));

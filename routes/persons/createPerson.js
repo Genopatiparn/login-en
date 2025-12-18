@@ -1,6 +1,18 @@
 const Person = require('../../models/Person');
 const multer = require('multer');
-const upload = multer();
+const path = require('path');
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); 
+  },
+  filename: function (req, file, cb) {
+    const uniqueName = 'image-' + Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname);
+    cb(null, uniqueName);
+  }
+});
+
+const upload = multer({ storage: storage });
 function parseNumber(value, defaultValue = null) {
   if (!value || value === '' || value === '-' || value === 'null' || value === 'undefined') {
     return defaultValue;
@@ -29,6 +41,11 @@ function createPerson(req, res) {
 }
 
 function processCreatePerson(req, res) {
+  let imagePath = '';
+  if (req.files && req.files.length > 0) {
+    imagePath = req.files[0].filename;
+    // อัปโหลดไฟล์สำเร็จ
+  }
 
   if (!req.body.lastName) {
     return res.status(400).json({ error: 'กรุณาระบุนามสกุล' });
@@ -48,7 +65,9 @@ function processCreatePerson(req, res) {
     }
   }
 
+
   const personData = {
+    id: req.body.id || '',
     thaiTitle: req.body.thaiTitle || '',
     firstName: req.body.firstName,
     lastName: req.body.lastName,
@@ -176,7 +195,7 @@ function processCreatePerson(req, res) {
     smokingHistory: req.body.smokingHistory || '',
     drinkingHistory: req.body.drinkingHistory || '',
     vaccinations: req.body.vaccinations || '',
-    image: req.body.image || ''
+    image: imagePath || req.body.image || '' 
   };
 
   const person = new Person(personData);

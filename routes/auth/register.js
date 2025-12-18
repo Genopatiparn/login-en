@@ -2,7 +2,7 @@ const User = require('../../models/User');
 
 async function register(req, res) {
   try {
-    const { username, password, email, firstName, lastName, phone, age, role } = req.body;
+    const { id, username, password, email, firstName, lastName, phone, age, role } = req.body;
     
     // ตรวจสอบข้อมูลที่จำเป็น
     if (!username) {
@@ -39,6 +39,7 @@ async function register(req, res) {
     
     // สร้างผู้ใช้งานใหม่
     const newUser = new User({
+      id: id || '', // เพิ่ม Custom ID
       username: username, 
       password: password, 
       email: email, 

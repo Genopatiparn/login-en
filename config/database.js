@@ -11,10 +11,7 @@ async function connectDB() {
     
     await mongoose.connect(mongoURI);
 
-    console.log(' เชื่อมต่อ Database สำเร็จ ');
-    console.log(` Database: ${mongoose.connection.name}`);
-    console.log(` Timezone: ${process.env.TZ}`);
-    console.log(` Connection State: ${mongoose.connection.readyState}`); // 1 = connected
+    // เชื่อมต่อ Database สำเร็จ
 
   } catch (error) {
     console.error('เชื่อมต่อ Database ไม่สำเร็จ :', error.message);

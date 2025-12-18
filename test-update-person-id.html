@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ทดสอบแก้ไข Custom ID ของ Person</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+        button:hover { background: #0056b3; }
+        .result { margin-top: 20px; padding: 10px; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h2>ทดสอบแก้ไข Custom ID ของ Person</h2>
+    
+    <div class="form-group">
+        <label>1. ดูข้อมูลปัจจุบัน:</label>
+        <input type="text" id="viewId" placeholder="ใส่ Custom ID หรือ MongoDB _id" value="88">
+        <button onclick="viewPerson()">ดูข้อมูล</button>
+    </div>
+    
+    <div class="form-group">
+        <label>2. แก้ไข Custom ID:</label>
+        <input type="text" id="currentId" placeholder="Custom ID ปัจจุบัน" value="88">
+        <input type="text" id="newId" placeholder="Custom ID ใหม่" value="STU2024001">
+        <button onclick="updatePersonId()">แก้ไข Custom ID</button>
+    </div>
+    
+    <div class="form-group">
+        <label>3. แก้ไขข้อมูลอื่นๆ พร้อม Custom ID:</label>
+        <input type="text" id="updateId" placeholder="Custom ID ที่จะแก้ไข" value="STU2024001">
+        <input type="text" id="newFirstName" placeholder="ชื่อใหม่">
+        <input type="text" id="newCustomId" placeholder="Custom ID ใหม่ (ถ้าต้องการเปลี่ยน)">
+        <button onclick="updatePersonData()">แก้ไขข้อมูล</button>
+    </div>
+    
+    <div id="result"></div>
+
+    <hr>
+
+    <h3>ตัวอย่างการใช้งาน:</h3>
+    <pre>
+// 1. ดูข้อมูลปัจจุบัน
+GET /api/persons/88
+
+// 2. แก้ไขเฉพาะ Custom ID
+PUT /api/persons/88
+{
+  "id": "STU2024001"
+}
+
+// 3. แก้ไขข้อมูลหลายอย่างพร้อมกัน
+PUT /api/persons/STU2024001
+{
+  "id": "STU2024002",
+  "firstName": "ชื่อใหม่",
+  "phone": "0812345678"
+}
+    </pre>
+
+    <script>
+        const baseUrl = 'http://localhost:3000';
+
+        async function viewPerson() {
+            const id = document.getElementById('viewId').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!id) {
+                resultDiv.innerHTML = '<div class="error">กรุณาใส่ ID</div>';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${baseUrl}/api/persons/${id}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="info">
+                            <strong>ข้อมูลปัจจุบัน:</strong><br>
+                            MongoDB _id: ${data.person._id}<br>
+                            Custom ID: ${data.person.id || 'ไม่มี'}<br>
+                            ชื่อ: ${data.person.firstName} ${data.person.lastName}<br>
+                            อีเมล: ${data.person.email}<br>
+                            เบอร์โทร: ${data.person.phone || 'ไม่มี'}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error"><strong>ข้อผิดพลาด:</strong> ${data.error}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error"><strong>ข้อผิดพลาด:</strong> ${error.message}</div>`;
+            }
+        }
+
+        async function updatePersonId() {
+            const currentId = document.getElementById('currentId').value;
+            const newId = document.getElementById('newId').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!currentId || !newId) {
+                resultDiv.innerHTML = '<div class="error">กรุณาใส่ ID ทั้งสองช่อง</div>';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${baseUrl}/api/persons/${currentId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: newId })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <strong>แก้ไข Custom ID สำเร็จ!</strong><br>
+                            เปลี่ยนจาก "${currentId}" เป็น "${newId}"<br>
+                            ชื่อ: ${data.person.firstName} ${data.person.lastName}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error"><strong>ข้อผิดพลาด:</strong> ${data.error}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error"><strong>ข้อผิดพลาด:</strong> ${error.message}</div>`;
+            }
+        }
+
+        async function updatePersonData() {
+            const id = document.getElementById('updateId').value;
+            const firstName = document.getElementById('newFirstName').value;
+            const customId = document.getElementById('newCustomId').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!id) {
+                resultDiv.innerHTML = '<div class="error">กรุณาใส่ ID ที่จะแก้ไข</div>';
+                return;
+            }
+            
+            const updateData = {};
+            if (firstName) updateData.firstName = firstName;
+            if (customId) updateData.id = customId;
+            
+            if (Object.keys(updateData).length === 0) {
+                resultDiv.innerHTML = '<div class="error">กรุณาใส่ข้อมูลที่ต้องการแก้ไข</div>';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${baseUrl}/api/persons/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updateData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <strong>แก้ไขข้อมูลสำเร็จ!</strong><br>
+                            ชื่อ: ${data.person.firstName} ${data.person.lastName}<br>
+                            Custom ID: ${data.person.id || 'ไม่มี'}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error"><strong>ข้อผิดพลาด:</strong> ${data.error}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error"><strong>ข้อผิดพลาด:</strong> ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

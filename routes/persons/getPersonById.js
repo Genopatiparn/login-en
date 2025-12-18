@@ -2,7 +2,9 @@ const Person = require('../../models/Person');
 module.exports = async (req, res) => {
   try {
     const id = req.params.id;
-    const person = await Person.findById(id); 
+    // ค้นหาด้วย Custom ID (แบบ junior dev)
+    const person = await Person.findOne({ id: id });
+    
     if (!person) {
       return res.status(404).json({ error: 'ไม่พบข้อมูลบุคคล' });
     }

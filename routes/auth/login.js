@@ -5,7 +5,6 @@ async function login(req, res) {
   try {
     // ตรวจสอบ database connection
     const mongoose = require('mongoose');
-    console.log('Database connection state:', mongoose.connection.readyState);
     if (mongoose.connection.readyState !== 1) {
       return res.status(500).json({ error: 'Database ไม่ได้เชื่อมต่อ' });
     }
@@ -46,12 +45,10 @@ async function login(req, res) {
     }
     
     // บันทึกสถานะการlogin
-    console.log('กำลังบันทึกสถานะ login สำหรับ:', user.username);
     const loggedInUser = new LoggedInUser({ username: user.username });
     
     try {
-      const savedLogin = await loggedInUser.save();
-      console.log('บันทึกสถานะ login สำเร็จ:', savedLogin);
+      await loggedInUser.save();
     } catch (saveError) {
       console.error('เกิดข้อผิดพลาดในการบันทึกสถานะ login:', saveError);
       return res.status(500).json({ error: 'ไม่สามารถบันทึกสถานะการเข้าสู่ระบบได้' });
