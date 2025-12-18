@@ -171,8 +171,11 @@ const personSchema = new mongoose.Schema({
   timestamps: true,
   toJSON: {
     transform: function(doc, ret) {
-      // เพิ่ม id กลับเข้าไป (แบบ junior dev)
-      ret.id = ret._id;
+      // ไม่ต้องเปลี่ยน id แล้ว ให้ใช้ Custom ID ที่มีอยู่ (แบบ junior dev)
+      // ถ้าไม่มี Custom ID ให้แสดงเป็น null
+      if (!ret.id) {
+        ret.id = null;
+      }
       
       // แปลง createdAt และ updatedAt เป็น timezone +07:00 (Thailand)
       if (ret.createdAt) {

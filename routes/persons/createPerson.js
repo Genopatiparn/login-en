@@ -67,7 +67,8 @@ function processCreatePerson(req, res) {
 
 
   const personData = {
-    id: req.body.id || '',
+    // เพิ่ม Custom ID เฉพาะเมื่อส่งมา (แบบ junior dev)
+    ...(req.body.id && { id: req.body.id }),
     thaiTitle: req.body.thaiTitle || '',
     firstName: req.body.firstName,
     lastName: req.body.lastName,
