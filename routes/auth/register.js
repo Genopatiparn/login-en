@@ -1,0 +1,71 @@
+const User = require('../../models/User');
+
+async function register(req, res) {
+  try {
+    const { username, password, email, firstName, lastName, phone, age, role } = req.body;
+    
+    // ตรวจสอบข้อมูลที่จำเป็น
+    if (!username) {
+      return res.status(400).json({ error: 'กรุณาระบุชื่อผู้ใช้งาน' });
+    }
+    
+    if (!password) {
+      return res.status(400).json({ error: 'กรุณาระบุรหัสผ่าน' });
+    }
+    
+    if (!email) {
+      return res.status(400).json({ error: 'กรุณาระบุอีเมล' });
+    }
+    
+    if (!firstName) {
+      return res.status(400).json({ error: 'กรุณาระบุชื่อ' });
+    }
+    
+    if (!lastName) {
+      return res.status(400).json({ error: 'กรุณาระบุนามสกุล' });
+    }
+    
+    // ตรวจสอบ username ซ้ำ
+    const existUser = await User.findOne({ username: username });
+    if (existUser) {
+      return res.status(400).json({ error: 'ชื่อผู้ใช้งานนี้ถูกใช้งานแล้ว' });
+    }
+    
+    // ตรวจสอบ email ซ้ำ
+    const existEmail = await User.findOne({ email: email });
+    if (existEmail) {
+      return res.status(400).json({ error: 'อีเมลนี้ถูกใช้งานแล้ว' });
+    }
+    
+    // สร้างผู้ใช้งานใหม่
+    const newUser = new User({
+      username: username, 
+      password: password, 
+      email: email, 
+      firstName: firstName, 
+      lastName: lastName,
+      phone: phone,
+      age: age,
+      role: role || 'user'
+    });
+    
+    const savedUser = await newUser.save();
+    
+    res.status(201).json({
+      message: 'ลงทะเบียนสมาชิกเรียบร้อยแล้ว',
+      user: {
+        username: savedUser.username,
+        email: savedUser.email,
+        firstName: savedUser.firstName,
+        lastName: savedUser.lastName,
+        role: savedUser.role
+      }
+    });
+    
+  } catch (error) {
+    console.error('เกิดข้อผิดพลาดในการลงทะเบียน:', error);
+    res.status(500).json({ error: 'เกิดข้อผิดพลาดในการลงทะเบียน' });
+  }
+}
+
+module.exports = register;
