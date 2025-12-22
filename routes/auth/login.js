@@ -1,5 +1,6 @@
 const User = require('../../models/User');
 const LoggedInUser = require('../../models/LoggedInUser');
+const bcrypt = require('bcrypt');
 async function login(req, res) {
   try {
     const mongoose = require('mongoose');
@@ -24,7 +25,9 @@ async function login(req, res) {
     if (!user) {
       return res.status(400).json({ error: 'ไม่พบชื่อผู้ใช้งานหรืออีเมลนี้' });
     }
-    if (user.password !== password) {
+    // ตรวจสอบรหัสผ่าน
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
       return res.status(400).json({ error: 'รหัสผ่านไม่ถูกต้อง' });
     }
     const existingLogin = await LoggedInUser.findOne({ username: user.username });

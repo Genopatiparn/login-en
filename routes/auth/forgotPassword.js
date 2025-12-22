@@ -1,4 +1,5 @@
 const User = require('../../models/User');
+const bcrypt = require('bcrypt');
 
 async function forgotPassword(req, res) {
   try {
@@ -13,9 +14,12 @@ async function forgotPassword(req, res) {
     if (!user) {
       return res.status(400).json({ error: 'ไม่พบอีเมลนี้ในระบบ' });
     } 
+    const saltRounds = 10;
+    const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+    
     await User.findOneAndUpdate(
       { email: email },
-      { password: newPassword },
+      { password: hashedNewPassword },
       { new: true }
     );
     

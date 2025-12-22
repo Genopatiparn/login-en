@@ -1,4 +1,5 @@
 const User = require('../../models/User');
+const bcrypt = require('bcrypt');
 
 async function register(req, res) {
   try {
@@ -27,10 +28,13 @@ async function register(req, res) {
       return res.status(400).json({ error: 'อีเมลนี้ถูกใช้งานแล้ว' });
     }
 
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
     const newUser = new User({
       id: id || '', 
       username: username, 
-      password: password, 
+      password: hashedPassword, 
       email: email, 
       firstName: firstName, 
       lastName: lastName,
