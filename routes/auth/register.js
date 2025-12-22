@@ -38,6 +38,7 @@ async function register(req, res) {
       age: age,
       role: role || 'user'
     }); 
+
     const savedUser = await newUser.save();    
     res.status(201).json({
       message: 'ลงทะเบียนสมาชิกเรียบร้อยแล้ว',

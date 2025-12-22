@@ -20,26 +20,20 @@ async function processUpdatePerson(req, res) {
     const updateData = { ...req.body };
     delete updateData._id;
     delete updateData.__v;
-
     if (req.uploadedImage) {
       updateData.image = req.uploadedImage;
     }
-
     if (!updateData.id) {
       updateData.id = id;
     }
-
     const updatedPerson = await Person.findOneAndUpdate({ id: id }, updateData, { new: true });
-
     if (!updatedPerson) {
       return res.status(404).json({ error: 'ไม่พบข้อมูลที่ต้องการแก้ไข' });
-    }
-    
+    } 
     res.json({
       message: 'แก้ไขข้อมูลเรียบร้อยแล้ว',
       person: updatedPerson
-    });
-    
+    });   
   } catch (error) {
     console.error('เกิดข้อผิดพลาดในการแก้ไขข้อมูล:', error);
     res.status(500).json({ error: 'เกิดข้อผิดพลาดในการแก้ไขข้อมูล' });

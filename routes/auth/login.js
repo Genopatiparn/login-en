@@ -1,36 +1,29 @@
 const User = require('../../models/User');
 const LoggedInUser = require('../../models/LoggedInUser');
-
 async function login(req, res) {
   try {
-
     const mongoose = require('mongoose');
     if (mongoose.connection.readyState !== 1) {
-      return res.status(500).json({ error: 'Database ไม่ได้เชื่อมต่อ' });
+      return res.status(500).json({ error: 'ไม่ได้เชื่อมต่อDatabase' });
     }
-    
     const { username, email, password } = req.body;
     const usernameOrEmail = username || email;
 
     if (!usernameOrEmail) {
       return res.status(400).json({ error: 'กรุณาระบุชื่อผู้ใช้งานหรืออีเมล' });
     }
-    
     if (!password) {
-      return res.status(400).json({ error: 'กรุณาระบุรหัสผ่าน' });
+      return res.status(400).json({ error: 'กรุณากรอกรหัสผ่าน' });
     }
-
     const user = await User.findOne({
       $or: [
         { username: usernameOrEmail },
         { email: usernameOrEmail }
       ]
-    });
-    
+    });   
     if (!user) {
       return res.status(400).json({ error: 'ไม่พบชื่อผู้ใช้งานหรืออีเมลนี้' });
     }
-
     if (user.password !== password) {
       return res.status(400).json({ error: 'รหัสผ่านไม่ถูกต้อง' });
     }

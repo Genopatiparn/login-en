@@ -14,6 +14,7 @@ async function logout(req, res) {
         { email: usernameOrEmail }
       ]
     });
+    
     if (!user) {
       return res.status(400).json({ error: 'ไม่พบข้อมูลผู้ใช้งานในระบบ' });
     }
