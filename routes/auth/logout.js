@@ -5,13 +5,9 @@ async function logout(req, res) {
   try {
     const { username, email } = req.body;
     const usernameOrEmail = username || email;
-    
-    // ตรวจสอบข้อมูลที่จำเป็น
     if (!usernameOrEmail) {
       return res.status(400).json({ error: 'กรุณาระบุชื่อผู้ใช้งานหรืออีเมล' });
     }
-    
-    // ค้นหาuser
     const user = await User.findOne({
       $or: [
         { username: usernameOrEmail },
@@ -21,16 +17,12 @@ async function logout(req, res) {
     if (!user) {
       return res.status(400).json({ error: 'ไม่พบข้อมูลผู้ใช้งานในระบบ' });
     }
-    
-    // ตรวจสอบสถานะการlogin
     const loggedInUser = await LoggedInUser.findOne({ username: user.username });
     if (!loggedInUser) {
       return res.status(400).json({ error: 'ผู้ใช้งานนี้ยังไม่ได้เข้าสู่ระบบ' });
     }
-    
-    // ลบสถานะการlogin
     await LoggedInUser.deleteOne({ username: user.username });
-    
+   
     res.json({
       message: 'ออกจากระบบเรียบร้อยแล้ว',
       username: user.username

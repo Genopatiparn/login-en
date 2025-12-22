@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const loggedInUserSchema = new mongoose.Schema({
-  // รหัสผู้ใช้งาน (แยกจาก _id)
   id: { type: String, unique: true, sparse: true },
   
   username: {
@@ -17,12 +16,9 @@ const loggedInUserSchema = new mongoose.Schema({
   timestamps: true,
   toJSON: {
     transform: function(doc, ret) {
-      // ไม่ต้องเปลี่ยน id แล้ว ให้ใช้ Custom ID ที่มีอยู่ (แบบ junior dev)
       if (!ret.id) {
         ret.id = null;
       }
-      
-      // แปลง loginTime, createdAt และ updatedAt เป็น timezone +07:00 (Thailand)
       if (ret.loginTime) {
         const loginTimeThailand = new Date(ret.loginTime.getTime() + (7 * 60 * 60 * 1000));
         ret.loginTime = loginTimeThailand.toISOString().replace('Z', '+07:00');
@@ -39,14 +35,10 @@ const loggedInUserSchema = new mongoose.Schema({
     }
   }
 });
-
-// Middleware สำหรับ LoggedInUser
 loggedInUserSchema.pre('save', function(next) {
   next();
 });
-
 loggedInUserSchema.post('save', function(doc) {
-  // บันทึกสำเร็จ
 });
 
 module.exports = mongoose.model('LoggedInUser', loggedInUserSchema);

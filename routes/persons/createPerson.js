@@ -1,18 +1,6 @@
 const Person = require('../../models/Person');
-const multer = require('multer');
-const path = require('path');
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/'); 
-  },
-  filename: function (req, file, cb) {
-    const uniqueName = 'image-' + Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname);
-    cb(null, uniqueName);
-  }
-});
-
-const upload = multer({ storage: storage });
+const { handleFileUpload } = require('../../middleware/upload');
+const { validatePersonData } = require('../../middleware/validation');
 function parseNumber(value, defaultValue = null) {
   if (!value || value === '' || value === '-' || value === 'null' || value === 'undefined') {
     return defaultValue;
@@ -27,32 +15,17 @@ function parseNumber(value, defaultValue = null) {
   return parsed;
 }
 function createPerson(req, res) {
-  const contentType = req.headers['content-type'] || '';
-  if (contentType.includes('multipart/form-data')) {
-    return upload.any()(req, res, function (err) {
-      if (err) {
-        console.error('เกิดข้อผิดพลาดในการ parse form-data:', err);
-        return res.status(400).json({ error: err.message });
-      }
-      return processCreatePerson(req, res);
+  handleFileUpload(req, res, () => {
+    validatePersonData(req, res, () => {
+      processCreatePerson(req, res);
     });
-  }
-  return processCreatePerson(req, res);
+  });
 }
 
 function processCreatePerson(req, res) {
   let imagePath = '';
-  if (req.files && req.files.length > 0) {
-    imagePath = req.files[0].filename;
-    // อัปโหลดไฟล์สำเร็จ
-  }
-
-  if (!req.body.lastName) {
-    return res.status(400).json({ error: 'กรุณาระบุนามสกุล' });
-  }
-  
-  if (!req.body.email) {
-    return res.status(400).json({ error: 'กรุณาระบุอีเมล' });
+  if (req.uploadedImage) {
+    imagePath = req.uploadedImage;
   }
 
   if (req.body.numberOfChildren !== undefined && req.body.numberOfChildren !== '') {
@@ -65,9 +38,7 @@ function processCreatePerson(req, res) {
     }
   }
 
-
   const personData = {
-    // เพิ่ม Custom ID เฉพาะเมื่อส่งมา (แบบ junior dev)
     ...(req.body.id && { id: req.body.id }),
     thaiTitle: req.body.thaiTitle || '',
     firstName: req.body.firstName,

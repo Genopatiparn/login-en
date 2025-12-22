@@ -17,7 +17,6 @@ async function getAllUsers(req, res) {
 async function getUsersByRole(req, res) {
   try {
     const role = req.params.role;
-    // วิธี junior dev: ใช้ MongoDB query ตรงๆ
     const users = await User.find({ role: role });
 
     if (users.length > 0) {

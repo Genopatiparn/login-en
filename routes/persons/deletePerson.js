@@ -1,10 +1,15 @@
 const Person = require('../../models/Person');
+const { checkDatabaseConnection } = require('../../middleware/database');
 
-async function deletePerson(req, res) {
+function deletePerson(req, res) {
+  checkDatabaseConnection(req, res, () => {
+    processDeletePerson(req, res);
+  });
+}
+
+async function processDeletePerson(req, res) {
   try {
-    const id = req.params.id;
-
-    // ค้นหาและลบด้วย Custom ID (แบบ junior dev)
+    const id = req.params.id
     const person = await Person.findOne({ id: id });
     if (person) {
       await Person.findOneAndDelete({ id: id });

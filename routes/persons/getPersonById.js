@@ -1,8 +1,14 @@
 const Person = require('../../models/Person');
-module.exports = async (req, res) => {
+const { checkDatabaseConnection } = require('../../middleware/database');
+function getPersonById(req, res) {
+  checkDatabaseConnection(req, res, () => {
+    processGetPersonById(req, res);
+  });
+}
+
+async function processGetPersonById(req, res) {
   try {
     const id = req.params.id;
-    // ค้นหาด้วย Custom ID (แบบ junior dev)
     const person = await Person.findOne({ id: id });
     
     if (!person) {
@@ -16,4 +22,6 @@ module.exports = async (req, res) => {
     console.error('เกิดข้อผิดพลาดในการดึงข้อมูลบุคคล:', error);
     res.status(500).json({ error: 'เกิดข้อผิดพลาดในการดึงข้อมูล' });
   }
-};
+}
+
+module.exports = getPersonById;

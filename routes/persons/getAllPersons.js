@@ -1,7 +1,6 @@
 const Person = require('../../models/Person');
 
 function getAllPersons(req, res) {
-  // ดึงข้อมูลบุคคลทั้งหมด
   Person.find({})
     .then(function(persons) {
       res.json({

@@ -1,9 +1,7 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  // รหัสผู้ใช้งาน (แยกจาก _id)
   id: { type: String, unique: true, sparse: true },
-  
   username: {
     type: String,
     required: true,
@@ -40,7 +38,7 @@ const userSchema = new mongoose.Schema({
   timestamps: true,
   toJSON: {
     transform: function(doc, ret) {
-      // แปลง createdAt และ updatedAt เป็น timezone +07:00 (Thailand)
+
       if (ret.createdAt) {
         const createdAtThailand = new Date(ret.createdAt.getTime() + (7 * 60 * 60 * 1000));
         ret.createdAt = createdAtThailand.toISOString().replace('Z', '+07:00');

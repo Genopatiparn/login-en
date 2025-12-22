@@ -1,33 +1,14 @@
 const Person = require('../../models/Person');
-const multer = require('multer');
-const path = require('path');
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/');
-  },
-  filename: function (req, file, cb) {
-    const uniqueName = 'image-' + Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname);
-    cb(null, uniqueName);
-  }
-});
-
-const upload = multer({ storage: storage });
+const { handleFileUpload } = require('../../middleware/upload');
+const { checkDuplicateId } = require('../../middleware/validation');
 
 function updatePerson(req, res) {
-  const contentType = req.headers['content-type'] || '';
-  if (contentType.includes('multipart/form-data')) {
-    return upload.any()(req, res, function (err) {
-      if (err) {
-        console.error('เกิดข้อผิดพลาดในการ parse form-data:', err);
-        return res.status(400).json({ error: err.message });
-      }
-      return processUpdatePerson(req, res);
+  handleFileUpload(req, res, () => {
+    checkDuplicateId(Person)(req, res, () => {
+      processUpdatePerson(req, res);
     });
-  }
-  return processUpdatePerson(req, res);
+  });
 }
-
 async function processUpdatePerson(req, res) {
   const id = req.params.id;
 
@@ -36,35 +17,16 @@ async function processUpdatePerson(req, res) {
   }
 
   try {
- 
-    let imagePath = '';
-    if (req.files && req.files.length > 0) {
-      imagePath = req.files[0].filename;
-
-    }
-
     const updateData = { ...req.body };
     delete updateData._id;
     delete updateData.__v;
-    
-    if (imagePath) {
-      updateData.image = imagePath;
+
+    if (req.uploadedImage) {
+      updateData.image = req.uploadedImage;
     }
 
-    // ถ้าไม่ส่ง Custom ID มา ให้เก็บ Custom ID เดิมไว้ (แบบ junior dev)
     if (!updateData.id) {
       updateData.id = id;
-    }
-
-    // ตรวจสอบ Custom ID ใหม่ซ้ำไหม (แบบ junior dev)
-    if (updateData.id && updateData.id !== id) {
-      const existingPerson = await Person.findOne({ id: updateData.id });
-      
-      if (existingPerson) {
-        return res.status(400).json({ 
-          error: `รหัส "${updateData.id}" ถูกใช้งานแล้วโดยคนอื่น`
-        });
-      }
     }
 
     const updatedPerson = await Person.findOneAndUpdate({ id: id }, updateData, { new: true });
