@@ -25,7 +25,6 @@ async function login(req, res) {
     if (!user) {
       return res.status(400).json({ error: 'ไม่พบชื่อผู้ใช้งานหรืออีเมลนี้' });
     }
-    // ตรวจสอบรหัสผ่าน
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(400).json({ error: 'รหัสผ่านไม่ถูกต้อง' });

@@ -27,7 +27,6 @@ async function register(req, res) {
     if (existEmail) {
       return res.status(400).json({ error: 'อีเมลนี้ถูกใช้งานแล้ว' });
     }
-
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
