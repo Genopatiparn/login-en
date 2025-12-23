@@ -23,6 +23,12 @@ function createPerson(req, res) {
 }
 
 function processCreatePerson(req, res) {
+  if (!req.uploadedImage && !req.body.image) {
+    return res.status(400).json({ 
+      error: 'กรุณาอัปโหลดรูปภาพ (ขนาดไม่เกิน 70KB, รองรับ jpg, jpeg, png, gif)' 
+    });
+  }
+
   let imagePath = '';
   if (req.uploadedImage) {
     imagePath = req.uploadedImage;

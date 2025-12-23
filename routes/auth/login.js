@@ -5,11 +5,11 @@ async function login(req, res) {
   try {
     const mongoose = require('mongoose');
     if (mongoose.connection.readyState !== 1) {
+      console.error('Database connection state:', mongoose.connection.readyState);
       return res.status(500).json({ error: 'ไม่ได้เชื่อมต่อDatabase' });
     }
     const { username, email, password } = req.body;
     const usernameOrEmail = username || email;
-
     if (!usernameOrEmail) {
       return res.status(400).json({ error: 'กรุณาระบุชื่อผู้ใช้งานหรืออีเมล' });
     }
@@ -29,16 +29,28 @@ async function login(req, res) {
     if (!isPasswordValid) {
       return res.status(400).json({ error: 'รหัสผ่านไม่ถูกต้อง' });
     }
-    const existingLogin = await LoggedInUser.findOne({ username: user.username });
-    if (existingLogin) {
-      return res.status(400).json({ error: 'บัญชีนี้มีการเข้าสู่ระบบอยู่แล้ว' });
-    }
-    const loggedInUser = new LoggedInUser({ username: user.username });
     try {
-      await loggedInUser.save();
-    } catch (saveError) {
-      console.error('เกิดข้อผิดพลาดในการบันทึกสถานะ login:', saveError);
-      return res.status(500).json({ error: 'ไม่สามารถบันทึกสถานะการเข้าสู่ระบบได้' });
+      const existingLogin = await LoggedInUser.findOne({ username: user.username });
+      if (existingLogin) {
+        existingLogin.loginTime = new Date();
+        await existingLogin.save();
+        console.log(`อัปเดตสถานะ login สำหรับ user: ${user.username}`);
+      } else {
+        const loggedInUser = new LoggedInUser({ username: user.username });
+        await loggedInUser.save();
+        console.log(`สร้างสถานะ login ใหม่สำหรับ user: ${user.username}`);
+      }
+    } catch (loginStateError) {
+      console.error('เกิดข้อผิดพลาดในการจัดการสถานะ login:', loginStateError);
+      console.error('Error details:', {
+        name: loginStateError.name,
+        message: loginStateError.message,
+        code: loginStateError.code
+      });
+      return res.status(500).json({ 
+        error: 'ไม่สามารถบันทึกสถานะการเข้าสู่ระบบได้',
+        details: loginStateError.message 
+      });
     }
     res.json({
       message: 'เข้าสู่ระบบสำเร็จ',

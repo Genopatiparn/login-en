@@ -1,0 +1,764 @@
+API Documentation - Person Management System
+
+Base URL: http://localhost:3000
+
+===============================================================================
+Authentication APIs
+===============================================================================
+
+1. สมัครสมาชิก (Register)
+
+API นี้ใช้สำหรับสมัครสมาชิกใหม่
+
+URL: http://localhost:3000/api/users/register
+Method: POST
+
+ตัวอย่าง Body (x-www-form-urlencoded):
+username = newuser          # ชื่อผู้ใช้งาน (บังคับ)
+password = 1234            # รหัสผ่าน (บังคับ)
+email = newuser@example.com # อีเมล (บังคับ)
+firstName = สมชาย          # ชื่อ (บังคับ)
+lastName = ใจดี            # นามสกุล (บังคับ)
+phone = 0812345678         # เบอร์โทร (ไม่บังคับ)
+age = 25                   # อายุ (ไม่บังคับ)
+role = user                # บทบาท (ไม่บังคับ, default: user)
+id = custom_id             # ID กำหนดเอง (ไม่บังคับ)
+
+ถ้าสมัครสมาชิกสำเร็จจะแสดง:
+{
+  "message": "ลงทะเบียนสมาชิกเรียบร้อยแล้ว",
+  "user": {
+    "username": "newuser",
+    "email": "newuser@example.com",
+    "firstName": "สมชาย",
+    "lastName": "ใจดี",
+    "role": "user"
+  }
+}
+
+ถ้าสมัครไม่สำเร็จจะแสดง:
+1. ไม่กรอกข้อมูลครบ:
+{ "error": "กรุณาระบุชื่อผู้ใช้งาน" }
+{ "error": "กรุณาระบุรหัสผ่าน" }
+{ "error": "กรุณาระบุอีเมล" }
+{ "error": "กรุณาระบุชื่อ" }
+{ "error": "กรุณาระบุนามสกุล" }
+
+2. ข้อมูลซ้ำ:
+{ "error": "ชื่อผู้ใช้งานนี้ถูกใช้งานแล้ว" }
+{ "error": "อีเมลนี้ถูกใช้งานแล้ว" }
+
+การทดสอบ:
+1. เลือก Method: POST
+2. ใส่ URL: http://localhost:3000/api/users/register
+3. ไปที่แถบ Body เลือก x-www-form-urlencoded
+4. ใส่ค่าในตาราง:
+   - Key: username Value: newuser
+   - Key: password Value: 1234
+   - Key: email Value: newuser@example.com
+   - Key: firstName Value: สมชาย
+   - Key: lastName Value: ใจดี
+5. กด Send
+
+-------------------------------------------------------------------------------
+
+2. เข้าสู่ระบบ (Login)
+
+API นี้ใช้สำหรับเข้าสู่ระบบด้วยชื่อผู้ใช้หรืออีเมล
+
+URL: http://localhost:3000/api/users/login
+Method: POST
+
+ตัวอย่าง Body (x-www-form-urlencoded):
+username = newuser         # ชื่อผู้ใช้งานหรืออีเมล (บังคับ)
+password = 1234           # รหัสผ่าน (บังคับ)
+
+หรือ
+
+email = newuser@example.com # อีเมลแทนชื่อผู้ใช้งาน (บังคับ)
+password = 1234            # รหัสผ่าน (บังคับ)
+
+ถ้าเข้าสู่ระบบสำเร็จจะแสดง:
+{
+  "message": "เข้าสู่ระบบสำเร็จ",
+  "user": {
+    "username": "newuser",
+    "email": "newuser@example.com",
+    "firstName": "สมชาย",
+    "lastName": "ใจดี",
+    "role": "user"
+  }
+}
+
+ถ้า login ไม่สำเร็จจะแสดง:
+1. ไม่กรอกข้อมูลครบ:
+{ "error": "กรุณาระบุชื่อผู้ใช้งานหรืออีเมล" }
+{ "error": "กรุณากรอกรหัสผ่าน" }
+
+2. ข้อมูลไม่ถูกต้อง:
+{ "error": "ไม่พบชื่อผู้ใช้งานหรืออีเมลนี้" }
+{ "error": "รหัสผ่านไม่ถูกต้อง" }
+
+3. ปัญหาระบบ:
+{ "error": "ไม่ได้เชื่อมต่อDatabase" }
+{ "error": "ไม่สามารถบันทึกสถานะการเข้าสู่ระบบได้" }
+
+การทดสอบ:
+1. เลือก Method: POST
+2. ใส่ URL: http://localhost:3000/api/users/login
+3. ไปที่แถบ Body เลือก x-www-form-urlencoded
+4. ใส่ค่าในตาราง:
+   - Key: username Value: newuser
+   - Key: password Value: 1234
+5. กด Send
+
+-------------------------------------------------------------------------------
+
+3. เปลี่ยนรหัสผ่าน (Change Password)
+
+API นี้ใช้สำหรับเปลี่ยนรหัสผ่าน
+
+URL: http://localhost:3000/api/users/changepassword
+Method: POST
+
+ตัวอย่าง Body (x-www-form-urlencoded):
+username = newuser         # ชื่อผู้ใช้งาน (บังคับ)
+oldPassword = 1234        # รหัสผ่านเดิม (บังคับ)
+newPassword = 5678        # รหัสผ่านใหม่ (บังคับ)
+
+ถ้าเปลี่ยนรหัสผ่านสำเร็จจะแสดง:
+{
+  "message": "เปลี่ยนรหัสผ่านเรียบร้อยแล้ว",
+  "username": "newuser"
+}
+
+ถ้าผิดพลาด:
+1. ไม่กรอกข้อมูลครบ:
+{ "error": "กรุณาระบุชื่อผู้ใช้งาน" }
+{ "error": "กรุณาระบุรหัสผ่านเก่า" }
+{ "error": "กรุณาระบุรหัสผ่านใหม่" }
+
+2. ข้อมูลไม่ถูกต้อง:
+{ "error": "ไม่พบชื่อผู้ใช้งานนี้ในระบบ" }
+{ "error": "รหัสผ่านเก่าไม่ถูกต้อง" }
+
+การทดสอบ:
+1. เลือก Method: POST
+2. ใส่ URL: http://localhost:3000/api/users/changepassword
+3. ไปที่แถบ Body เลือก x-www-form-urlencoded
+4. ใส่ค่าในตาราง:
+   - Key: username Value: newuser
+   - Key: oldPassword Value: 1234
+   - Key: newPassword Value: 5678
+5. กด Send
+
+-------------------------------------------------------------------------------
+
+4. ลืมรหัสผ่าน (Forgot Password)
+
+API นี้ใช้สำหรับรีเซ็ตรหัสผ่านด้วยอีเมล
+
+URL: http://localhost:3000/api/users/forgotpassword
+Method: POST
+
+ตัวอย่าง Body (x-www-form-urlencoded):
+email = newuser@example.com # อีเมล (บังคับ)
+newPassword = newpass123   # รหัสผ่านใหม่ (บังคับ)
+
+ถ้าสำเร็จจะแสดง:
+{
+  "message": "ตั้งค่ารหัสผ่านใหม่เรียบร้อยแล้ว",
+  "email": "newuser@example.com"
+}
+
+ถ้าผิดพลาด:
+{ "error": "กรุณาระบุอีเมล" }
+{ "error": "กรุณาระบุรหัสผ่านใหม่" }
+{ "error": "ไม่พบอีเมลนี้ในระบบ" }
+
+การทดสอบ:
+1. เลือก Method: POST
+2. ใส่ URL: http://localhost:3000/api/users/forgotpassword
+3. ไปที่แถบ Body เลือก x-www-form-urlencoded
+4. ใส่ค่าในตาราง:
+   - Key: email Value: newuser@example.com
+   - Key: newPassword Value: newpass123
+5. กด Send
+
+-------------------------------------------------------------------------------
+
+5. ออกจากระบบ (Logout)
+
+API นี้ใช้สำหรับออกจากระบบ
+
+URL: http://localhost:3000/api/users/logout
+Method: POST
+
+ตัวอย่าง Body (x-www-form-urlencoded):
+username = newuser         # ชื่อผู้ใช้งานหรืออีเมล (บังคับ)
+
+หรือ
+
+email = newuser@example.com # อีเมลแทนชื่อผู้ใช้งาน (บังคับ)
+
+ถ้าสำเร็จจะแสดง:
+{
+  "message": "ออกจากระบบเรียบร้อยแล้ว",
+  "username": "newuser"
+}
+
+ถ้าผิดพลาด:
+{ "error": "กรุณาระบุชื่อผู้ใช้งานหรืออีเมล" }
+{ "error": "ไม่พบข้อมูลผู้ใช้งานในระบบ" }
+{ "error": "ผู้ใช้งานนี้ยังไม่ได้เข้าสู่ระบบ" }
+
+การทดสอบ:
+1. เลือก Method: POST
+2. ใส่ URL: http://localhost:3000/api/users/logout
+3. ไปที่แถบ Body เลือก x-www-form-urlencoded
+4. ใส่ค่าในตาราง:
+   - Key: username Value: newuser
+5. กด Send
+
+-------------------------------------------------------------------------------
+
+6. ดูข้อมูลผู้ใช้ทั้งหมด (Get All Users)
+
+API นี้ใช้สำหรับดูข้อมูลผู้ใช้งานทั้งหมด
+
+URL: http://localhost:3000/api/users/
+Method: GET
+
+ไม่ต้องส่ง Body
+
+ถ้าสำเร็จจะแสดง:
+{
+  "message": "ดึงข้อมูลผู้ใช้งานทั้งหมดสำเร็จ",
+  "users": [
+    {
+      "_id": "...",
+      "username": "newuser",
+      "email": "newuser@example.com",
+      "firstName": "สมชาย",
+      "lastName": "ใจดี",
+      "role": "user",
+      "createdAt": "2025-12-23T07:00:00.000Z",
+      "updatedAt": "2025-12-23T07:00:00.000Z"
+    }
+  ],
+  "total": 1
+}
+
+การทดสอบ:
+1. เลือก Method: GET
+2. ใส่ URL: http://localhost:3000/api/users/
+3. กด Send
+
+-------------------------------------------------------------------------------
+
+7. ดูข้อมูลผู้ใช้ตามบทบาท (Get Users by Role)
+
+API นี้ใช้สำหรับดูข้อมูลผู้ใช้งานตามบทบาท
+
+URL: http://localhost:3000/api/users/{role}
+Method: GET
+
+ตัวอย่าง URL:
+http://localhost:3000/api/users/admin
+http://localhost:3000/api/users/user
+http://localhost:3000/api/users/manager
+
+ถ้าสำเร็จจะแสดง:
+{
+  "message": "ดึงข้อมูลผู้ใช้งานกลุ่ม user สำเร็จ",
+  "users": [
+    {
+      "_id": "...",
+      "username": "newuser",
+      "email": "newuser@example.com",
+      "firstName": "สมชาย",
+      "lastName": "ใจดี",
+      "role": "user"
+    }
+  ],
+  "total": 1
+}
+
+ถ้าไม่พบ:
+{ "error": "ไม่พบผู้ใช้งานในบทบาทนี้" }
+
+การทดสอบ:
+1. เลือก Method: GET
+2. ใส่ URL: http://localhost:3000/api/users/user
+3. กด Send
+
+-------------------------------------------------------------------------------
+
+8. ลบผู้ใช้งาน (Delete User)
+
+API นี้ใช้สำหรับลบผู้ใช้งาน
+
+URL: http://localhost:3000/api/users/{id}
+Method: DELETE
+
+ตัวอย่าง URL:
+http://localhost:3000/api/users/user123
+
+ถ้าสำเร็จจะแสดง:
+{
+  "message": "ลบผู้ใช้งานเรียบร้อยแล้ว",
+  "deletedUser": "newuser"
+}
+
+ถ้าผิดพลาด:
+{ "error": "กรุณาระบุ ID" }
+{ "error": "ไม่พบผู้ใช้งานที่ต้องการลบ" }
+
+การทดสอบ:
+1. เลือก Method: DELETE
+2. ใส่ URL: http://localhost:3000/api/users/user123
+3. กด Send
+
+===============================================================================
+Person Management APIs
+===============================================================================
+
+9. ดูข้อมูลบุคคลทั้งหมด (Get All Persons)
+
+API นี้ใช้สำหรับดูข้อมูลบุคคลทั้งหมด
+
+URL: http://localhost:3000/api/persons/
+Method: GET
+
+ไม่ต้องส่ง Body
+
+ถ้าสำเร็จจะแสดง:
+{
+  "message": "ดึงข้อมูลบุคคลทั้งหมดสำเร็จ",
+  "persons": [
+    {
+      "_id": "...",
+      "id": "person001",
+      "firstName": "สมชาย",
+      "lastName": "ใจดี",
+      "email": "somchai@example.com",
+      "phone": "0812345678",
+      "age": 25,
+      "type": "student",
+      "createdAt": "2025-12-23T07:00:00.000Z"
+    }
+  ],
+  "total": 1
+}
+
+การทดสอบ:
+1. เลือก Method: GET
+2. ใส่ URL: http://localhost:3000/api/persons/
+3. กด Send
+
+-------------------------------------------------------------------------------
+
+10. ดูข้อมูลบุคคลตาม ID (Get Person by ID)
+
+API นี้ใช้สำหรับดูข้อมูลบุคคลคนเดียว
+
+URL: http://localhost:3000/api/persons/{id}
+Method: GET
+
+ตัวอย่าง URL:
+http://localhost:3000/api/persons/person001
+
+ถ้าสำเร็จจะแสดง:
+{
+  "message": "ดึงข้อมูลบุคคลสำเร็จ",
+  "person": {
+    "_id": "...",
+    "id": "person001",
+    "firstName": "สมชาย",
+    "lastName": "ใจดี",
+    "email": "somchai@example.com",
+    "phone": "0812345678",
+    "age": 25,
+    "type": "student"
+  }
+}
+
+ถ้าไม่พบ:
+{ "error": "ไม่พบข้อมูลบุคคล" }
+
+การทดสอบ:
+1. เลือก Method: GET
+2. ใส่ URL: http://localhost:3000/api/persons/person001
+3. กด Send
+
+-------------------------------------------------------------------------------
+
+11. เพิ่มข้อมูลบุคคล (Create Person)
+
+API นี้ใช้สำหรับเพิ่มข้อมูลบุคคลใหม่ (บังคับต้องอัปโหลดรูปภาพ)
+
+URL: http://localhost:3000/api/persons/
+Method: POST
+
+*** สำคัญ: API นี้บังคับต้องอัปโหลดรูปภาพ ขนาดไม่เกิน 70KB ***
+
+ตัวอย่าง Body (form-data):
+
+ข้อมูลพื้นฐาน (บังคับ):
+image = [เลือกไฟล์รูปภาพ]  # รูปภาพ (บังคับ, ไม่เกิน 70KB, jpg/jpeg/png/gif)
+firstName = สมชาย          # ชื่อ (บังคับ)
+lastName = ใจดี            # นามสกุล (บังคับ)
+email = somchai@example.com # อีเมล (บังคับ)
+
+ข้อมูลเพิ่มเติม (ไม่บังคับ):
+id = person001             # ID กำหนดเอง
+thaiTitle = นาย            # คำนำหน้าชื่อไทย
+englishTitle = Mr.         # คำนำหน้าชื่ออังกฤษ
+englishFirstName = Somchai # ชื่ออังกฤษ
+englishMiddleName = -      # ชื่อกลางอังกฤษ
+englishLastName = Jaidee   # นามสกุลอังกฤษ
+nickname = ชาย             # ชื่อเล่น
+formerName = -             # ชื่อเดิม
+age = 25                   # อายุ
+phone = 0812345678         # เบอร์โทร
+phoneSecondary = 0987654321 # เบอร์โทรสำรอง
+workEmail = work@company.com # อีเมลที่ทำงาน
+type = student             # ประเภท (student/employee/other)
+
+ข้อมูลบัตรประชาชน:
+nationalId = 1234567890123  # เลขบัตรประชาชน
+idCardIssueDate = 2020-01-01 # วันที่ออกบัตร
+idCardExpiryDate = 2030-01-01 # วันหมดอายุบัตร
+birthDate = 1998-01-01      # วันเกิด
+birthProvince = กรุงเทพฯ     # จังหวัดที่เกิด
+birthDistrict = บางรัก       # อำเภอที่เกิด
+nationality = ไทย           # สัญชาติ
+race = ไทย                  # เชื้อชาติ
+religion = พุทธ             # ศาสนา
+physicalMarks = ไม่มี        # รอยประจำตัว
+
+ที่อยู่ตามทะเบียนบ้าน:
+regHouseNumber = 123        # บ้านเลขที่
+regMoo = 5                  # หมู่
+regSoi = ลาดพร้าว 15        # ซอย
+regRoad = ลาดพร้าว          # ถนน
+regSubDistrict = จอมพล      # ตำบล/แขวง
+regDistrict = จตุจักร        # อำเภอ/เขต
+regProvince = กรุงเทพฯ       # จังหวัด
+regPostalCode = 10900       # รหัสไปรษณีย์
+
+ที่อยู่ปัจจุบัน:
+curHouseNumber = 456        # บ้านเลขที่ปัจจุบัน
+curMoo = 3                  # หมู่ปัจจุบัน
+curSoi = รามคำแหง 24        # ซอยปัจจุบัน
+curRoad = รามคำแหง          # ถนนปัจจุบัน
+curSubDistrict = หัวหมาก    # ตำบล/แขวงปัจจุบัน
+curDistrict = บางกะปิ       # อำเภอ/เขตปัจจุบัน
+curProvince = กรุงเทพฯ       # จังหวัดปัจจุบัน
+curPostalCode = 10240       # รหัสไปรษณีย์ปัจจุบัน
+residenceType = บ้านเช่า     # ประเภทที่อยู่อาศัย
+
+Social Media:
+lineId = somchai123         # Line ID
+facebookUrl = facebook.com/somchai # Facebook URL
+linkedinUrl = linkedin.com/somchai # LinkedIn URL
+instagramUrl = instagram.com/somchai # Instagram URL
+
+ข้อมูลครอบครัว:
+fatherName = สมศักดิ์ ใจดี   # ชื่อบิดา
+fatherAge = 55              # อายุบิดา
+fatherOccupation = ข้าราชการ # อาชีพบิดา
+fatherPhone = 0811111111    # เบอร์โทรบิดา
+fatherStatus = มีชีวิต       # สถานะบิดา
+
+motherName = สมหญิง ใจดี     # ชื่อมารดา
+motherAge = 50              # อายุมารดา
+motherOccupation = แม่บ้าน   # อาชีพมารดา
+motherPhone = 0822222222    # เบอร์โทรมารดา
+motherStatus = มีชีวิต       # สถานะมารดา
+
+maritalStatus = โสด         # สถานะสมรส
+marriageDate = -            # วันแต่งงาน
+spouseName = -              # ชื่อคู่สมรส
+spouseOccupation = -        # อาชีพคู่สมรส
+spouseWorkplace = -         # ที่ทำงานคู่สมรส
+spousePhone = -             # เบอร์โทรคู่สมรส
+
+numberOfChildren = 0        # จำนวนบุตร
+childName1 = -              # ชื่อบุตรคนที่ 1
+childAge1 = -               # อายุบุตรคนที่ 1
+childSchool1 = -            # โรงเรียนบุตรคนที่ 1
+
+การศึกษา:
+edu1Level = ปริญญาตรี       # ระดับการศึกษา 1
+edu1Institution = จุฬาลงกรณ์มหาวิทยาลัย # สถาบัน 1
+edu1Major = วิศวกรรมคอมพิวเตอร์ # สาขา 1
+edu1Gpa = 3.50              # เกรดเฉลี่ย 1
+edu1GraduationYear = 2020   # ปีที่จบ 1
+
+edu2Level = ปริญญาโท        # ระดับการศึกษา 2
+edu2Institution = -         # สถาบัน 2
+edu2Major = -               # สาขา 2
+edu2Gpa = -                 # เกรดเฉลี่ย 2
+edu2GraduationYear = -      # ปีที่จบ 2
+
+certificates = TOEIC 850    # ใบรับรอง
+languages = ไทย, อังกฤษ     # ภาษาที่ใช้ได้
+testScores = TOEIC: 850     # คะแนนสอบ
+computerSkills = Microsoft Office, Programming # ทักษะคอมพิวเตอร์
+specialSkills = การนำเสนอ   # ทักษะพิเศษ
+
+ประสบการณ์ทำงาน:
+work1Company = บริษัท ABC   # บริษัทที่ 1
+work1Position = โปรแกรมเมอร์ # ตำแหน่งที่ 1
+work1StartDate = 2020-06-01 # วันเริ่มงานที่ 1
+work1EndDate = 2022-05-31   # วันสิ้นสุดงานที่ 1
+work1Salary = 25000         # เงินเดือนที่ 1
+work1ResignationReason = เปลี่ยนงาน # เหตุผลลาออกที่ 1
+
+work2Company = -            # บริษัทที่ 2
+work2Position = -           # ตำแหน่งที่ 2
+work2StartDate = -          # วันเริ่มงานที่ 2
+work2EndDate = -            # วันสิ้นสุดงานที่ 2
+work2Salary = -             # เงินเดือนที่ 2
+work2ResignationReason = -  # เหตุผลลาออกที่ 2
+
+เอกสารและใบอนุญาต:
+militaryStatus = ผ่านแล้ว    # สถานะทหาร
+passportNumber = AB1234567  # เลขหนังสือเดินทาง
+passportIssueDate = 2020-01-01 # วันออกหนังสือเดินทาง
+passportExpiryDate = 2030-01-01 # วันหมดอายุหนังสือเดินทาง
+
+carLicenseNumber = 12345678 # เลขใบขับขี่รถยนต์
+carLicenseExpiry = 2025-12-31 # วันหมดอายุใบขับขี่รถยนต์
+motorcycleLicenseNumber = 87654321 # เลขใบขับขี่รถจักรยานยนต์
+motorcycleLicenseExpiry = 2025-12-31 # วันหมดอายุใบขับขี่รถจักรยานยนต์
+publicTransportLicenseNumber = - # เลขใบขับขี่รถขนส่งสาธารณะ
+publicTransportLicenseExpiry = - # วันหมดอายุใบขับขี่รถขนส่งสาธารณะ
+
+workPermitNumber = -        # เลขใบอนุญาทำงาน
+workPermitIssueDate = -     # วันออกใบอนุญาตทำงาน
+workPermitExpiryDate = -    # วันหมดอายุใบอนุญาตทำงาน
+
+ข้อมูลร่างกายและสุขภาพ:
+height = 170                # ส่วนสูง (ซม.)
+weight = 65                 # น้ำหนัก (กก.)
+bloodType = O               # กรุ๊ปเลือด
+shirtSize = M               # ไซส์เสื้อ
+waistSize = 32              # ไซส์เอว
+shoeSize = 42               # ไซส์รองเท้า
+chestSize = 38              # ไซส์อก
+headSize = 57               # ไซส์หัว
+
+colorBlindness = ไม่มี       # ตาบอดสี
+chronicDiseases = ไม่มี      # โรคประจำตัว
+allergies = ไม่มี           # ภูมิแพ้
+surgeryHistory = ไม่มี       # ประวัติการผ่าตัด
+smokingHistory = ไม่สูบ      # ประวัติการสูบบุหรี่
+drinkingHistory = ไม่ดื่ม    # ประวัติการดื่มสุรา
+vaccinations = ครบถ้วน      # ประวัติการฉีดวัคซีน
+
+ถ้าสำเร็จจะแสดง:
+{
+  "message": "สร้างข้อมูลเรียบร้อยแล้ว",
+  "person": {
+    "_id": "...",
+    "id": "person001",
+    "firstName": "สมชาย",
+    "lastName": "ใจดี",
+    "email": "somchai@example.com",
+    "phone": "0812345678",
+    "age": 25,
+    "type": "student",
+    "createdAt": "2025-12-23T07:00:00.000Z"
+  }
+}
+
+ถ้าผิดพลาด:
+{ "error": "กรุณาระบุชื่อ" }
+{ "error": "กรุณาระบุนามสกุล" }
+{ "error": "กรุณาระบุอีเมล" }
+{ "error": "กรุณาอัปโหลดรูปภาพ (ขนาดไม่เกิน 70KB, รองรับ jpg, jpeg, png, gif)" }
+{ "error": "ขนาดไฟล์รูปภาพต้องไม่เกิน 70KB" }
+{ "error": "รองรับเฉพาะไฟล์รูปภาพ (jpg, jpeg, png, gif) เท่านั้น" }
+{ "error": "จำนวนลูกต้องเป็นตัวเลขเท่านั้น" }
+
+การทดสอบ:
+1. เลือก Method: POST
+2. ใส่ URL: http://localhost:3000/api/persons/
+3. ไปที่แถบ Body เลือก form-data (ไม่ใช่ x-www-form-urlencoded)
+4. ใส่ค่าในตาราง:
+   - Key: image Type: File Value: [เลือกไฟล์รูปภาพ ขนาดไม่เกิน 70KB]
+   - Key: firstName Type: Text Value: สมชาย
+   - Key: lastName Type: Text Value: ใจดี
+   - Key: email Type: Text Value: somchai@example.com
+   - Key: phone Type: Text Value: 0812345678
+   - Key: age Type: Text Value: 25
+   - Key: type Type: Text Value: student
+5. กด Send
+
+การอัปโหลดรูปภาพ (บังคับ):
+1. ใช้ form-data เท่านั้น (ไม่สามารถใช้ x-www-form-urlencoded ได้)
+2. เพิ่ม Key: image และเลือก Type เป็น File
+3. เลือกไฟล์รูปภาพ (jpg, jpeg, png, gif) ขนาดไม่เกิน 70KB
+4. เพิ่มข้อมูลอื่นๆ โดยเลือก Type เป็น Text
+
+ข้อจำกัดของรูปภาพ:
+- ขนาดไฟล์: ไม่เกิน 70KB (71,680 bytes)
+- ประเภทไฟล์: jpg, jpeg, png, gif เท่านั้น
+- จำเป็นต้องมี: บังคับต้องอัปโหลดรูปภาพ
+
+-------------------------------------------------------------------------------
+
+12. แก้ไขข้อมูลบุคคล (Update Person)
+
+API นี้ใช้สำหรับแก้ไขข้อมูลบุคคล (สามารถอัปโหลดรูปภาพใหม่ได้)
+
+URL: http://localhost:3000/api/persons/{id}
+Method: PUT
+
+ตัวอย่าง URL:
+http://localhost:3000/api/persons/person001
+
+ตัวอย่าง Body (form-data หรือ x-www-form-urlencoded):
+
+สำหรับการแก้ไขข้อมูลทั่วไป (x-www-form-urlencoded):
+firstName = สมชาย (แก้ไข)   # ชื่อใหม่
+lastName = ใจดี (แก้ไข)     # นามสกุลใหม่
+age = 26                    # อายุใหม่
+phone = 0898765432          # เบอร์โทรใหม่
+
+สำหรับการเปลี่ยนรูปภาพ (form-data):
+image = [เลือกไฟล์รูปภาพใหม่] # รูปภาพใหม่ (ไม่เกิน 70KB, jpg/jpeg/png/gif)
+firstName = สมชาย (แก้ไข)   # ชื่อใหม่
+age = 26                    # อายุใหม่
+
+หมายเหตุ: สามารถส่งเฉพาะฟิลด์ที่ต้องการแก้ไขเท่านั้น
+
+ถ้าสำเร็จจะแสดง:
+{
+  "message": "แก้ไขข้อมูลเรียบร้อยแล้ว",
+  "person": {
+    "_id": "...",
+    "id": "person001",
+    "firstName": "สมชาย (แก้ไข)",
+    "lastName": "ใจดี (แก้ไข)",
+    "email": "somchai@example.com",
+    "phone": "0898765432",
+    "age": 26,
+    "type": "student",
+    "updatedAt": "2025-12-23T08:00:00.000Z"
+  }
+}
+
+ถ้าผิดพลาด:
+{ "error": "กรุณาระบุ ID" }
+{ "error": "ไม่พบข้อมูลที่ต้องการแก้ไข" }
+
+การทดสอบ:
+
+สำหรับการแก้ไขข้อมูลทั่วไป:
+1. เลือก Method: PUT
+2. ใส่ URL: http://localhost:3000/api/persons/person001
+3. ไปที่แถบ Body เลือก x-www-form-urlencoded
+4. ใส่ค่าในตาราง:
+   - Key: firstName Value: สมชาย (แก้ไข)
+   - Key: age Value: 26
+5. กด Send
+
+สำหรับการเปลี่ยนรูปภาพ:
+1. เลือก Method: PUT
+2. ใส่ URL: http://localhost:3000/api/persons/person001
+3. ไปที่แถบ Body เลือก form-data
+4. ใส่ค่าในตาราง:
+   - Key: image Type: File Value: [เลือกไฟล์รูปภาพใหม่ ขนาดไม่เกิน 70KB]
+   - Key: firstName Type: Text Value: สมชาย (แก้ไข)
+   - Key: age Type: Text Value: 26
+5. กด Send
+
+-------------------------------------------------------------------------------
+
+13. ลบข้อมูลบุคคล (Delete Person)
+
+API นี้ใช้สำหรับลบข้อมูลบุคคล
+
+URL: http://localhost:3000/api/persons/{id}
+Method: DELETE
+
+ตัวอย่าง URL:
+http://localhost:3000/api/persons/person001
+
+ถ้าสำเร็จจะแสดง:
+{
+  "message": "ลบข้อมูลเรียบร้อยแล้ว",
+  "deletedId": "person001"
+}
+
+ถ้าผิดพลาด:
+{ "error": "ไม่พบข้อมูลที่ต้องการลบ" }
+
+การทดสอบ:
+1. เลือก Method: DELETE
+2. ใส่ URL: http://localhost:3000/api/persons/person001
+3. กด Send
+
+===============================================================================
+สรุป API Endpoints
+===============================================================================
+
+Authentication APIs:
+- POST /api/users/register - สมัครสมาชิก
+- POST /api/users/login - เข้าสู่ระบบ
+- POST /api/users/logout - ออกจากระบบ
+- POST /api/users/changepassword - เปลี่ยนรหัสผ่าน
+- POST /api/users/forgotpassword - ลืมรหัสผ่าน
+- GET /api/users/ - ดูข้อมูลผู้ใช้ทั้งหมด
+- GET /api/users/{role} - ดูข้อมูลผู้ใช้ตามบทบาท
+- DELETE /api/users/{id} - ลบผู้ใช้งาน
+
+Person Management APIs:
+- GET /api/persons/ - ดูข้อมูลบุคคลทั้งหมด
+- GET /api/persons/{id} - ดูข้อมูลบุคคลตาม ID
+- POST /api/persons/ - เพิ่มข้อมูลบุคคล
+- PUT /api/persons/{id} - แก้ไขข้อมูลบุคคล
+- DELETE /api/persons/{id} - ลบข้อมูลบุคคล
+
+===============================================================================
+การใช้งานทั่วไป
+===============================================================================
+
+Headers ที่แนะนำ:
+Content-Type: application/x-www-form-urlencoded
+
+Status Codes:
+- 200 - สำเร็จ
+- 201 - สร้างข้อมูลสำเร็จ
+- 400 - ข้อมูลไม่ถูกต้อง
+- 404 - ไม่พบข้อมูล
+- 500 - เกิดข้อผิดพลาดในระบบ
+
+ข้อมูลที่ส่งกลับ:
+- สำเร็จ: { "message": "...", "data": {...} }
+- ผิดพลาด: { "error": "..." }
+
+===============================================================================
+การเริ่มต้นใช้งาน
+===============================================================================
+
+1. เริ่มเซิร์ฟเวอร์:
+   npm start
+
+2. ทดสอบการเชื่อมต่อ:
+   GET http://localhost:3000/
+
+3. สมัครสมาชิกก่อน:
+   POST http://localhost:3000/api/users/register
+
+4. เข้าสู่ระบบ:
+   POST http://localhost:3000/api/users/login
+
+5. เริ่มใช้งาน Person APIs
+
+===============================================================================
+
+หมายเหตุ: API นี้ใช้ bcrypt สำหรับเข้ารหัสรหัสผ่าน และรองรับการอัปโหลดไฟล์รูปภาพสำหรับข้อมูลบุคคล

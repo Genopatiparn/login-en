@@ -35,10 +35,5 @@ const loggedInUserSchema = new mongoose.Schema({
     }
   }
 });
-loggedInUserSchema.pre('save', function(next) {
-  next();
-});
-loggedInUserSchema.post('save', function(doc) {
-});
 
 module.exports = mongoose.model('LoggedInUser', loggedInUserSchema);
