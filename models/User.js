@@ -33,6 +33,17 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     default: 'user'
+  },
+  // ฟิลด์สำหรับ reset password (แบบไม่ส่งอีเมล)
+  resetToken: {
+    type: String
+  },
+  resetTokenExpiry: {
+    type: Date
+  },
+  // ฟิลด์สำหรับเก็บคำตอบคำถามความปลอดภัยชั่วคราว
+  tempSecurityAnswers: {
+    type: String
   }
 }, {
   timestamps: true,
