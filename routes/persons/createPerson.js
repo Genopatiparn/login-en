@@ -25,7 +25,7 @@ function createPerson(req, res) {
 function processCreatePerson(req, res) {
   if (!req.uploadedImage && !req.body.image) {
     return res.status(400).json({ 
-      error: 'กรุณาอัปโหลดรูปภาพ (ขนาดไม่เกิน 70KB, รองรับ jpg, jpeg, png, gif)' 
+      error: 'กรุณาอัปโหลดรูปภาพ (ขนาดไม่เกิน 70KB)' 
     });
   }
 
@@ -60,7 +60,7 @@ function processCreatePerson(req, res) {
     phoneSecondary: req.body.phoneSecondary || '',
     email: req.body.email,
     workEmail: req.body.workEmail || '',
-    type: req.body.type || 'student',
+    type: req.body.type || '',
     nationalId: req.body.nationalId || '',
     idCardIssueDate: req.body.idCardIssueDate || '',
     idCardExpiryDate: req.body.idCardExpiryDate || '',

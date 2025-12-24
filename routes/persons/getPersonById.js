@@ -5,7 +5,6 @@ function getPersonById(req, res) {
     processGetPersonById(req, res);
   });
 }
-
 async function processGetPersonById(req, res) {
   try {
     const id = req.params.id;

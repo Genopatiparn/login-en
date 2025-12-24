@@ -1,5 +1,4 @@
 const User = require('../../models/User');
-
 async function getAllUsers(req, res) {
   try {
     const users = await User.find({});
@@ -13,7 +12,6 @@ async function getAllUsers(req, res) {
     res.status(500).json({ error: 'เกิดข้อผิดพลาดในการดึงข้อมูลผู้ใช้งาน' });
   }
 }
-
 async function getUsersByRole(req, res) {
   try {
     const role = req.params.role;

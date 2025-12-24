@@ -1,7 +1,7 @@
 const User = require('../../models/User');
 const bcrypt = require('bcrypt');
-
 async function changePassword(req, res) {
+  
   try {
     const { username, oldPassword, newPassword } = req.body;
     if (!username) {
@@ -21,16 +21,14 @@ async function changePassword(req, res) {
     if (!isOldPasswordValid) {
       return res.status(400).json({ error: 'รหัสผ่านเก่าไม่ถูกต้อง' });
     } 
-
     const saltRounds = 10;
-    const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
-    
+    const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);    
+
     await User.findOneAndUpdate(
       { username: username },
       { password: hashedNewPassword },
       { new: true }
-    );
-    
+    );    
     res.json({
       message: 'เปลี่ยนรหัสผ่านเรียบร้อยแล้ว',
       username: username

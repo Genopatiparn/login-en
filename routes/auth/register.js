@@ -1,6 +1,5 @@
 const User = require('../../models/User');
 const bcrypt = require('bcrypt');
-
 async function register(req, res) {
   try {
     const { id, username, password, email, firstName, lastName, phone, age, role } = req.body;
@@ -29,7 +28,6 @@ async function register(req, res) {
     }
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-
     const newUser = new User({
       id: id || '', 
       username: username, 
@@ -41,7 +39,6 @@ async function register(req, res) {
       age: age,
       role: role || 'user'
     }); 
-
     const savedUser = await newUser.save();    
     res.status(201).json({
       message: 'ลงทะเบียนสมาชิกเรียบร้อยแล้ว',

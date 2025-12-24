@@ -1,6 +1,5 @@
 var express = require('express');
 var router = express.Router();
-
 const getAllPersons = require('./getAllPersons');
 const getPersonById = require('./getPersonById');
 const createPerson = require('./createPerson');

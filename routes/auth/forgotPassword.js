@@ -1,6 +1,5 @@
 const User = require('../../models/User');
 const bcrypt = require('bcrypt');
-
 async function forgotPassword(req, res) {
   try {
     const { email, newPassword } = req.body;
@@ -16,18 +15,15 @@ async function forgotPassword(req, res) {
     } 
     const saltRounds = 10;
     const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
-    
     await User.findOneAndUpdate(
       { email: email },
       { password: hashedNewPassword },
       { new: true }
     );
-    
     res.json({
       message: 'ตั้งค่ารหัสผ่านใหม่เรียบร้อยแล้ว',
       email: email
     });
-    
   } catch (error) {
     console.error('เกิดข้อผิดพลาดในการรีเซ็ตรหัสผ่าน:', error);
     res.status(500).json({ error: 'เกิดข้อผิดพลาดในการรีเซ็ตรหัสผ่าน' });

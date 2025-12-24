@@ -1,6 +1,5 @@
 const User = require('../../models/User');
 const LoggedInUser = require('../../models/LoggedInUser');
-
 async function logout(req, res) {
   try {
     const { username, email } = req.body;
@@ -13,8 +12,7 @@ async function logout(req, res) {
         { username: usernameOrEmail },
         { email: usernameOrEmail }
       ]
-    });
-    
+    });    
     if (!user) {
       return res.status(400).json({ error: 'ไม่พบข้อมูลผู้ใช้งานในระบบ' });
     }
@@ -22,13 +20,11 @@ async function logout(req, res) {
     if (!loggedInUser) {
       return res.status(400).json({ error: 'ผู้ใช้งานนี้ยังไม่ได้เข้าสู่ระบบ' });
     }
-    await LoggedInUser.deleteOne({ username: user.username });
-   
+    await LoggedInUser.deleteOne({ username: user.username });   
     res.json({
       message: 'ออกจากระบบเรียบร้อยแล้ว',
       username: user.username
-    });
-    
+    });    
   } catch (error) {
     console.error('เกิดข้อผิดพลาดในการออกจากระบบ:', error);
     res.status(500).json({ error: 'เกิดข้อผิดพลาดในการออกจากระบบ' });

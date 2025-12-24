@@ -1,5 +1,4 @@
 const Person = require('../../models/Person');
-
 function getAllPersons(req, res) {
   Person.find({})
     .then(function(persons) {

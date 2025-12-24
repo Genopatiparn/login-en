@@ -1,9 +1,6 @@
 const multer = require('multer');
 const path = require('path');
 
-const multer = require('multer');
-const path = require('path');
-
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'uploads/'); 
@@ -13,7 +10,6 @@ const storage = multer.diskStorage({
     cb(null, uniqueName);
   }
 });
-
 const upload = multer({ 
   storage: storage,
   limits: {
@@ -27,7 +23,7 @@ const upload = multer({
     if (mimetype && extname) {
       return cb(null, true);
     } else {
-      cb(new Error('รองรับเฉพาะไฟล์รูปภาพ (jpg, jpeg, png, gif) เท่านั้น'));
+      cb(new Error('รองรับเฉพาะไฟล์รูปภาพ '));
     }
   }
 });

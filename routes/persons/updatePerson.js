@@ -1,7 +1,6 @@
 const Person = require('../../models/Person');
 const { handleFileUpload } = require('../../middleware/upload');
 const { checkDuplicateId } = require('../../middleware/validation');
-
 function updatePerson(req, res) {
   handleFileUpload(req, res, () => {
     checkDuplicateId(Person)(req, res, () => {
